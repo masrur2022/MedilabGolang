@@ -52,3 +52,4 @@ signUp.onsubmit = evt =>{
 
     xhr.send(data);
 }
+
