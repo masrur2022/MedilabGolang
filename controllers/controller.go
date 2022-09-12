@@ -5,14 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	// "os"
 	"time"
 
-	// "net/smtp"
 	"strings"
 
-	// "github.com/dgrijalva/jwt-go"
 	"medcard/beck/bycrypt"
 	"medcard/beck/converter"
 	jwtauthentication "medcard/beck/jwtAuthentication"
@@ -23,7 +19,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var globeUserLog structures.DoctorLog
@@ -36,6 +31,8 @@ var CtxG context.Context
 func Login(c *gin.Context) {
 	c.ShouldBindJSON(&globeUserLog)
 	fmt.Println(globeUserLog)
+	//"""""""" converter function calling""""""""
+	converter.Convert()
 	//""""""" mongoDb connection"""""""
 	mongoconnection.MongoDB()
 	CtxG := mongoconnection.CtxG
@@ -43,40 +40,94 @@ func Login(c *gin.Context) {
 	var DBgetUser structures.DoctorLog
 	collection := ClientG.Database("MedCard").Collection("users")
 	collection.FindOne(CtxG, bson.M{"login": globeUserLog.Login}).Decode(&DBgetUser)
-	// """"""""""""""""""""""compare the password with bycrypt""""""""""""""""""""""
-	compareResult := bycrypt.CompareHashPasswords(DBgetUser.Password, globeUserLog.Password)
+	fmt.Println(DBgetUser)
 
-	if compareResult != true {
-		c.Writer.WriteHeader(http.StatusUnauthorized)
-	} else {
-		// Finally, we set the client cookie for "token" as the JWT we just generated
-		// we also set an expiry time which is the same as the token itself
-		http.SetCookie(c.Writer, &http.Cookie{
-			Name:     "token",
-			Value:    jwtauthentication.GenerateToken(c, globeUserLog.Email),
-			Expires:  time.Now().Add(1 * time.Minute),
-			HttpOnly: false,
-			Secure:   true,
-			Path:     "/",
-		})
-		// """""""""""""""""""""""""send the login for user"""""""""""""""""""""""""
-		c.JSON(200, gin.H{
-			"LOGIN": DBgetUser.Login,
-		})
-		// """""""""""""""""""""connect to online collection to add user and make him online"""""""""""""""""""""
-		var online structures.Online
-		collectionOnline := ClientG.Database("MedCard").Collection("online")
-		online.Login = DBgetUser.Login
-		online.Permissions = DBgetUser.Permissions
-		// """""""""""""insert data into db"""""""""""""
-		collectionOnline.InsertOne(CtxG, online)
+	if DBgetUser.Password == "admin"{
+		if globeUserLog.Password != "admin" {
+			c.Writer.WriteHeader(http.StatusUnauthorized)
+			// """""""""""""""""""""""""send the request result"""""""""""""""""""""""""
+			c.JSON(400, gin.H{
+				"STATUS": "CANNOT_AUTHORIZED",
+			})
+		} else {
+			// Finally, we set the client cookie for "token" as the JWT we just generated
+			// we also set an expiry time which is the same as the token itself
+			http.SetCookie(c.Writer, &http.Cookie{
+				Name:     "token",
+				Value:    jwtauthentication.GenerateToken(c, globeUserLog.Login),
+				Expires:  time.Now().Add(30 * time.Hour),
+				HttpOnly: false,
+				Secure:   true,
+				SameSite: http.SameSiteNoneMode,
+				Path:     "/",
+			})
+			// """""""""""""""""""""""""send the login for user"""""""""""""""""""""""""
+			if DBgetUser.Permissions == "admin"{
+				c.JSON(200, gin.H{
+					"LOGIN": DBgetUser.Login,
+					"url": "http://localhost:3000/admin",
+				})
+			}else if DBgetUser.Permissions == "client"{
+				c.JSON(200, gin.H{
+					"LOGIN": DBgetUser.Login,
+					"url": "http://localhost:3000/userpanel",
+				})
+			}else if DBgetUser.Permissions == "doctors"{
+				c.JSON(200, gin.H{
+					"LOGIN": DBgetUser.Login,
+					"url": "http://localhost:3000/DoctorPanel",
+				})
+			}
+		}
+	}else{
+		// """"""""""""""""""""""compare the password with bycrypt""""""""""""""""""""""
+		compareResult := bycrypt.CompareHashPasswords(DBgetUser.Password, globeUserLog.Password)
+		fmt.Printf("globeUserLog.Password: %v\n", globeUserLog.Password)
+		fmt.Printf("DBgetUser.Password: %v\n", DBgetUser.Password)
+		fmt.Printf("compareResult: %v\n", compareResult)
+
+		if compareResult != true {
+			c.Writer.WriteHeader(http.StatusUnauthorized)
+			// """""""""""""""""""""""""send the request result"""""""""""""""""""""""""
+			c.JSON(400, gin.H{
+				"STATUS": "CANNOT_AUTHORIZED",
+			})
+		} else {
+			// Finally, we set the client cookie for "token" as the JWT we just generated
+			// we also set an expiry time which is the same as the token itself
+			http.SetCookie(c.Writer, &http.Cookie{
+				Name:     "token",
+				Value:    jwtauthentication.GenerateToken(c, globeUserLog.Login),
+				Expires:  time.Now().Add(30 * time.Hour),
+				HttpOnly: false,
+				Secure:   true,
+				SameSite: http.SameSiteNoneMode,
+				Path:     "/",
+			})
+			// """""""""""""""""""""""""send the login for user"""""""""""""""""""""""""
+			if DBgetUser.Permissions == "admin"{
+				c.JSON(200, gin.H{
+					"LOGIN": DBgetUser.Login,
+					"url": "http://localhost:3000/admin",
+				})
+			}else if DBgetUser.Permissions == "client"{
+				c.JSON(200, gin.H{
+					"LOGIN": DBgetUser.Login,
+					"url": "http://localhost:3000/userpanel",
+				})
+			}else if DBgetUser.Permissions == "doctors"{
+				c.JSON(200, gin.H{
+					"LOGIN": DBgetUser.Login,
+					"url": "http://localhost:3000/DoctorPanel",
+				})
+			}
+		}
 	}
 }
 func SignupDr(c *gin.Context) {
 	// jwtauthentication.Velidation(c)
 	// """""""""get he json request from client """""""""
 	// c.ShouldBindJSON(&globeUserLog)
-	converter.Convert("doctors")
 	jsonFM := c.Request.FormValue("json")
 	files, handler, errIMG := c.Request.FormFile("img")
 	// """""""""""""""""""""""check The file on existense"""""""""""""""""""""""
@@ -106,18 +157,17 @@ func SignupDr(c *gin.Context) {
 		var DbgetUser structures.DoctorLog
 		collection.FindOne(CtxG, bson.M{"login": compiledLogin}).Decode(&DbgetUser)
 
-		collectionUser := ClientG.Database("MedCard").Collection("users")
-		var DbgetDoc structures.DoctorLog
-		collectionUser.FindOne(CtxG, bson.M{"login": compiledLogin}).Decode(&DbgetDoc)
 		// permission check
-		var accepted = Permission(c, globeUserLog.RequestLogin)
-		if accepted != "admin" {
+		payloadlogin := jwtauthentication.Velidation(c)
+		fmt.Println(payloadlogin.Id)
+		var accept = Permission(c, payloadlogin.Login)
+		if accept != "admin" {
 			c.JSON(http.StatusExpectationFailed, gin.H{
 				"status": "NO_PERMISSION_TO_DO_THIS",
 			})
 		} else {
 			//"""""""""""""""""" find out if there any user with such logo""""""""""""""""""
-			if DbgetUser.Login != "" || DbgetDoc.Login != ""{
+			if DbgetUser.Login != ""{
 				c.Writer.WriteHeader(http.StatusBadRequest)
 				c.JSON(http.StatusExpectationFailed, gin.H{
 					"status": "EXIST",
@@ -140,14 +190,12 @@ func SignupDr(c *gin.Context) {
 				fmt.Println(hashedPassword)
 				// """""""""""""""Insert the user ino dataBase if its valid"""""""""""""""
 				collection.InsertOne(CtxG, globeUserLog)
-				converter.Convert("doctors")
 			}
 		}
 	}
 }
 func SignupCl(c *gin.Context) {
 	// jwtauthentication.Velidation(c)
-	converter.Convert("clients")
 	var globeUserLog structures.ClientLog
 	// """""""""get he json request from client """""""""
 	c.ShouldBindJSON(&globeUserLog)
@@ -155,7 +203,7 @@ func SignupCl(c *gin.Context) {
 	// """"""""""""""""""check the login velidation""""""""""""""""""
 	compiledLogin := bycrypt.ChecktheLogin(globeUserLog.Login)
 	//""""" check if any field is ampty"""""
-	if globeUserLog.Blood == "" || globeUserLog.Login == "" || globeUserLog.Name == "" || globeUserLog.Password == "" || globeUserLog.Sername == "" || globeUserLog.Gender == "" || globeUserLog.LastName == "" || globeUserLog.RequestLogin == "" {
+	if globeUserLog.Blood == "" || globeUserLog.Login == "" || globeUserLog.Name == "" || globeUserLog.Password == "" || globeUserLog.Sername == "" || globeUserLog.Gender == "" || globeUserLog.LastName == "" {
 		c.JSON(400, gin.H{
 			"status": "NOT_COMLETE",
 		})
@@ -172,8 +220,10 @@ func SignupCl(c *gin.Context) {
 		var DbgetDoc structures.ClientLog
 		collectionUser.FindOne(CtxG, bson.M{"login": compiledLogin}).Decode(&DbgetDoc)
 		// permission check
-		var accepted = Permission(c, globeUserLog.RequestLogin)
-		if accepted != "admin" {
+		payloadlogin := jwtauthentication.Velidation(c)
+		fmt.Println(payloadlogin.Id)
+		var accept = Permission(c, payloadlogin.Login)
+		if accept != "admin" {
 			c.JSON(http.StatusExpectationFailed, gin.H{
 				"status": "NO_PERMISSION_TO_DO_THIS",
 			})
@@ -189,7 +239,6 @@ func SignupCl(c *gin.Context) {
 				hashedPassword, err := bycrypt.HashPassword(globeUserLog.Password)
 				if err != nil {
 					fmt.Fprintf(c.Writer, err.Error())
-					return
 				}
 				globeUserLog.Password = hashedPassword
 				globeUserLog.Login = compiledLogin
@@ -200,7 +249,9 @@ func SignupCl(c *gin.Context) {
 				fmt.Println(hashedPassword)
 				// """""""""""""""Insert the user ino dataBase if its valid"""""""""""""""
 				collection.InsertOne(CtxG, globeUserLog)
-				converter.Convert("clients")
+				c.JSON(200, gin.H{
+					"status": "Succeded",
+				})
 			}
 		}
 	}
@@ -210,6 +261,7 @@ func AddQuestion(c *gin.Context) {
 	// jwtauthentication.Velidation(c)
 	// """"""""""""""bind the json resived from user to structure""""""""""""""
 	c.ShouldBindJSON(&FAQ)
+	fmt.Println(FAQ)
 	// """""""""""""""""""""""check the verbles are they filled out """""""""""""""""""""""
 	if FAQ.Description == "" || FAQ.Title == "" {
 		c.JSON(400, gin.H{
@@ -232,7 +284,10 @@ func AddQuestion(c *gin.Context) {
 				"status": "EXIST",
 			})
 		} else {
-			var accept = Permission(c, FAQ.RequestLogin)
+			// """"""get the json request""""""
+			payloadlogin := jwtauthentication.Velidation(c)
+			fmt.Println(payloadlogin.Id)
+			var accept = Permission(c, payloadlogin.Login)
 			if accept == "doctors" || accept == "admin" {
 				titleArr := strings.Split(FAQ.Description, " ")
 				// """""""""""""""check the question response limit"""""""""""""""
@@ -267,7 +322,10 @@ func RemoveQuestion(c *gin.Context) {
 			"status": "NOTCOMLETE",
 		})
 	} else {
-		var accept = Permission(c, FAQ.RequestLogin)
+		// """"""get the json request""""""
+		payloadlogin := jwtauthentication.Velidation(c)
+		fmt.Println(payloadlogin.Id)
+		var accept = Permission(c, payloadlogin.Login)
 		if accept == "admin" {
 			converter.Remove(c, "frequently_asked_question", FAQ.Id)
 		} else {
@@ -280,7 +338,6 @@ func RemoveQuestion(c *gin.Context) {
 func AdminProfileChange(c *gin.Context) {
 	// """"""""""""""verify does the user has cookie or not""""""""""""""
 	// jwtauthentication.Velidation(c)
-	converter.Convert("admins")
 	var globeUserLog structures.AdminLog
 	// """""""""get he json request from client """""""""
 	// c.ShouldBindJSON(&globeUserLog)
@@ -319,13 +376,16 @@ func AdminProfileChange(c *gin.Context) {
 		} else {
 			// """""""""""""""""""""""""check the email on MX velidation"""""""""""""""""""""""""
 			var isEmailVelid = bycrypt.ValidateMX(globeUserLog.Email)
-			if isEmailVelid != nil {
+			if isEmailVelid == nil {
 				c.JSON(http.StatusExpectationFailed, gin.H{
 					"status": "EMAIL_DOES_NOT_VALID",
 				})
 			} else {
 				fmt.Printf("globeUserLog.RequestLogin: %v\n", globeUserLog.RequestLogin)
-				var accept = Permission(c, globeUserLog.RequestLogin)
+				// """"""get the json request""""""
+				payloadlogin := jwtauthentication.Velidation(c)
+				var accept = Permission(c, payloadlogin.Login)
+				fmt.Printf("accept: %v\n", accept)
 				if accept != "admin" {
 					c.JSON(http.StatusExpectationFailed, gin.H{
 						"status": "NO_PERMISSION_TO_DO_THIS",
@@ -349,7 +409,6 @@ func AdminProfileChange(c *gin.Context) {
 					fmt.Println(hashedPassword)
 					// """""""""""""""Insert the user ino dataBase if its valid"""""""""""""""
 					collection.InsertOne(CtxG, globeUserLog)
-					converter.Convert("admins")
 				}
 			}
 		}
@@ -370,9 +429,9 @@ func Permission(c *gin.Context, requestLogin string) string {
 	return isAccepted
 }
 func Statistics(c *gin.Context) {
-	var statistc structures.Dr_get_views
-	c.ShouldBindJSON(&statistc)
-	var accept = Permission(c, statistc.RequestLogin)
+	payloadlogin := jwtauthentication.Velidation(c)
+	fmt.Println(payloadlogin.Id)
+	var accept = Permission(c, payloadlogin.Login)
 	if accept != "admin" {
 		c.JSON(http.StatusExpectationFailed, gin.H{
 			"status": "NO_PERMISSION_TO_DO_THIS",
@@ -404,13 +463,7 @@ func Statistics(c *gin.Context) {
 		// """""""""""""""""""local veriables"""""""""""""""""""
 		var userOnlineArr []structures.DoctorLog
 		var allOnlineUsers int
-
-		// """"""""""""""""""""data base connection""""""""""""""""""""
-		mongoconnection.MongoDB()
-		ClientO := mongoconnection.ClientG
-		CtxO := mongoconnection.CtxG
-		collectionO := ClientO.Database("MedCard").Collection("online")
-		cursorO, err := collectionO.Find(CtxO, bson.M{})
+		cursorO, err := collection.Find(CtxG, bson.M{"userstatus":"online"})
 		// """""""""""""""""""handle the error"""""""""""""""""""
 		if err != nil {
 			fmt.Fprintf(c.Writer, err.Error())
@@ -430,9 +483,9 @@ func Statistics(c *gin.Context) {
 	}
 }
 func Users_clients(c *gin.Context) {
-	var statistc structures.Dr_get_views
-	c.ShouldBindJSON(&statistc)
-	var accept = Permission(c, statistc.RequestLogin)
+	payloadlogin := jwtauthentication.Velidation(c)
+	fmt.Println(payloadlogin.Id)
+	var accept = Permission(c, payloadlogin.Login)
 	if accept != "admin" {
 		c.JSON(http.StatusExpectationFailed, gin.H{
 			"status": "NO_PERMISSION_TO_DO_THIS",
@@ -507,24 +560,23 @@ func Questions_get(c *gin.Context) {
 func Logout(c *gin.Context) {
 	// """"""""""""""verify does the user has cookie or not""""""""""""""
 	// jwtauthentication.Velidation(c)
+	payloadlogin := jwtauthentication.Velidation(c)
+	// var accept = Permission(c, payloadlogin.Login)
 	// get the data from the user for logout
-	c.ShouldBindJSON(&globeUserLog)
 	// Finally, we set the client cookie for "token" as the JWT we just generated
 	// we also set an expiry time which is the same as the token itself
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     "token",
-		Value:    jwtauthentication.GenerateToken(c, globeUserLog.Email),
-		Expires:  time.Now().Add(-1 * time.Minute),
+		Value:    jwtauthentication.GenerateToken(c, payloadlogin.Login),
+		Expires:  time.Now().Add(-20 * time.Hour),
 		HttpOnly: false,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 	})
-	// Mongo connection
-	mongoconnection.MongoDB()
-	ClientG := mongoconnection.ClientG
-	CtxG := mongoconnection.CtxG
-	collectionOne := ClientG.Database("MedCard").Collection("online")
-	collectionOne.DeleteOne(CtxG, bson.M{"login": globeUserLog.Login})
+	c.JSON(200,gin.H{
+		"url":"http://localhost:3000/",
+	})
 }
 func Cors(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")

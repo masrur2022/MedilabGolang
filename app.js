@@ -53,3 +53,4 @@ signUp.onsubmit = evt =>{
     xhr.send(data);
 }
 
+let na =["hell","hee"]

@@ -50,9 +50,12 @@ type FrequentlyAskedQuestion struct {
 }
 type Users struct {
 	Password     string `json:"password"`
-	RequestLogin string `json:"requestLogin"`
 	Login        string `json:"login"`
 	Permissions  string `json:"permissions"`
+	Id           string `json:"id"`
+	LastActive   string `json:"lastactive"` 
+	UserStatus   string `json:"userStatus"`
+	PrimitiveID  primitive.ObjectID `json:"primitiveid" bson:"_id"`
 }
 type AdminLog struct {
 	PrimitiveID  primitive.ObjectID `json:"primitiveid" bson:"_id"`
@@ -69,6 +72,8 @@ type AdminLog struct {
 type Online struct {
 	Login       string `json:"login"`
 	Permissions string `json:"permissions"`
+	LastActive  string `json:"lastactive"` 
+	UserStatus  string `json:"userStatus"`
 }
 type Results struct {
 	Sickness     string `json:"sickness"`
@@ -82,7 +87,6 @@ type ViewReq struct {
 	Status        string `json:"status"`
 	Phone         string `json:"phone"`
 	ClientId      string `json:"clientid"`
-	RequestLogin  string `json:"requestLogin"`
 	DoctorId      string `json:"doctorid"`
 	ClientName    string `json:"clientname"`
 	ClientSername string `json:"clientsername"`
@@ -90,7 +94,6 @@ type ViewReq struct {
 type Accept_Decline struct {
 	Date     string `json:"date"`
 	ClientId string `json:"clientid"`
-	Status   string `json:"status"`
 }
 type Dr_get_views struct {
 	Id           string `json:"id"`

@@ -30,45 +30,39 @@ func Routers() {
 	emc_get := controllers.Emc_get
 	// """"""""""""""routers""""""""""""""
 	r := gin.Default()
-	r.StaticFS("/static", gin.Dir("/static", true))
+	r.StaticFS("/static", gin.Dir("./static", true))
 	r.Use(cors)
 	// """"""""""""""""""""""""""""POST requests""""""""""""""""""""""""""""
 	// Login && password
-	r.POST("/login", login)
+	r.POST("/login", login)                                   //Done
 	//
-	r.POST("/logout", logout)
+	r.GET("/logout", logout)                                 //Done
 	// DoctorLog "struct is used for"
-	r.POST("/signup_dr", signupDocktors)
+	r.POST("/signup_dr", signupDocktors)                      //Done
 	// ClientLog "struct is used for"
-	r.POST("/signup_cl", signupClient)
+	r.POST("/signup_cl", signupClient)                        //Done
 	// ViewReq "struct is used for"
-	r.POST("/signup_cl_view", signup_cl_view)
+	r.POST("/signup_cl_view", signup_cl_view)                 //Done
 	// FrequentlyAskedQuestion "struct is used for"
-	r.POST("/question_add", addQuestion)
+	r.POST("/question_add", addQuestion)                      //Done
 	// AdminLog "struct is used for"
-	r.POST("/admin_prof_change", adminProfileChange)
+	r.POST("/admin_prof_change", adminProfileChange)          //Done
 	// DoctorLog "struct is used for"
-	r.POST("/doctor_prof_change", doctorProfileChange)
+	r.POST("/doctor_prof_change", doctorProfileChange)        //Done
 	// ClientLog "struct is used for"
-	r.POST("/client_prof_change", client_prof_change)
+	r.POST("/client_prof_change", client_prof_change)         //Done
 	// Accept_Decline "struct is used for"
 	r.POST("/accept_decline", accept_decline)
-	// Dr_get_views "struct is used for"
-	r.POST("/statistics", statistics)
-	// Dr_get_views "struct is used for"
-	r.POST("/users_clients", users_clients)
-	// Dr_get_views "struct is used for"
-	r.POST("/clients_get", clients_get)
-	// Dr_get_views "struct is used for"
-	r.POST("/views_get_dr", views_get_dr)
-	// Dr_get_views "struct is used for"
-	r.POST("/views_get_cl", views_get_cl)
-	// Dr_get_views "struct is used for"
-	r.POST("/emc_get", emc_get)
-	// """""""""""""""""""GET requests"""""""""""""""""""
-	r.GET("/questions_get", questions_get)
-	r.GET("/doctors_get", doctors_get)
-	r.DELETE("/question_rm", removeQuestion)
+											// """""""""""""""""""GET requests"""""""""""""""""""
+	r.GET("/statistics", statistics)                          //Done
+	r.GET("/users_clients", users_clients)                    //Done
+	r.GET("/clients_get", clients_get)                        //Done
+	r.GET("/views_get_dr", views_get_dr)                      //Done
+	r.GET("/views_get_cl", views_get_cl)                      //Done
+	r.GET("/emc_get", emc_get)                                //Done
+	r.GET("/questions_get", questions_get)                    //Done
+	r.GET("/doctors_get", doctors_get)                        //Done
+	r.DELETE("/question_rm", removeQuestion)                  
 
 	r.Run(":4400")
 
