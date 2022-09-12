@@ -99,6 +99,7 @@ func DoctorProfileChange(c *gin.Context) {
 			c.JSON(404, gin.H{
 				"STATUS": "NOT_COMPLETE",
 			})
+			fmt.Println(userOne)
 		} else {
 			// """"""get the json request""""""
 			fmt.Println(payloadlogin.Id)
@@ -133,16 +134,16 @@ func DoctorProfileChange(c *gin.Context) {
 				collection.InsertOne(CtxG, globeUserLog)
 
 				//"""""""""""""""""" replace the user with new one in `users` DB """"""""""""""""""
-				var usersStruct structures.Users
+				// var usersStruct structures.Users
 				collectionUsers := ClientG.Database("MedCard").Collection("users")
 				// collection.FindOne(CtxG, bson.M{"login": payloadlogin.Login}).Decode(&globeUserLog)
 				collectionUsers.DeleteOne(CtxG,bson.M{"login":payloadlogin.Login})
-				usersStruct.Id = globeUserLog.ID
-				usersStruct.Password = hashedPassword
-				usersStruct.Login = globeUserLog.Login
-				usersStruct.Permissions = globeUserLog.Permissions
-				usersStruct.PrimitiveID = globeUserLog.PrimitiveID
-				collectionUsers.InsertOne(CtxG,usersStruct)
+				// usersStruct.Id = globeUserLog.ID
+				// usersStruct.Password = hashedPassword
+				// usersStruct.Login = globeUserLog.Login
+				// usersStruct.Permissions = globeUserLog.Permissions
+				// usersStruct.PrimitiveID = globeUserLog.PrimitiveID
+				// collectionUsers.InsertOne(CtxG,usersStruct)
 			}
 		}
 	}
