@@ -336,12 +336,12 @@ func Views_get_dr(c *gin.Context) {
 			"status": "NO_REQUEST_FOUND",
 		})
 	} else {
-		if accept != "doctors" {
+		if accept == "doctors" || accept == "client" {
+			c.JSON(200, DbgetUserArr)
+		} else {
 			c.JSON(http.StatusExpectationFailed, gin.H{
 				"status": "NO_PERMISSION_TO_DO_THIS",
 			})
-		} else {
-			c.JSON(200, DbgetUserArr)
 		}
 	}
 }
