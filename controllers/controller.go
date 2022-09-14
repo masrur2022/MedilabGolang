@@ -587,5 +587,6 @@ func Cors(c *gin.Context) {
 		c.AbortWithStatus(200)
 		return
 	}
+	
 	c.Next()
 }
