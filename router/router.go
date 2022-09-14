@@ -2,6 +2,7 @@ package router
 
 import (
 	"medcard/beck/controllers"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,6 +65,6 @@ func Routers() {
 	r.GET("/doctors_get", doctors_get)                        //Done
 	r.DELETE("/question_rm", removeQuestion)                  
 
-	r.Run(":4400")
+	r.Run(":"+os.Getenv("PORT"))
 
 }

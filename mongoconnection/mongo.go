@@ -15,7 +15,7 @@ var CtxG context.Context
 var ClientG *mongo.Client
 
 func MongoDB() {
-	clientOptions := options.Client().ApplyURI("mongodb://127.0.0.1:27018")
+	clientOptions := options.Client().ApplyURI(os.Getenv("DB_URL git add ."))
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		fmt.Println("Mongo.connect() ERROR: ", err)
