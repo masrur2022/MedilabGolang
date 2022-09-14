@@ -578,6 +578,7 @@ func Logout(c *gin.Context) {
 		"url":"http://localhost:3000/",
 	})
 }
+
 func Cors(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "https://46.137.15.86:443")
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
