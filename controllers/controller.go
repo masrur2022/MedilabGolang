@@ -108,7 +108,7 @@ func Login(c *gin.Context) {
 			if DBgetUser.Permissions == "admin"{
 				c.JSON(200, gin.H{
 					"LOGIN": DBgetUser.Login,
-					"url": "http://localhost:3000/admin",
+					"url": "http://127.0.0.1:3000//admin",
 				})
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
@@ -118,7 +118,7 @@ func Login(c *gin.Context) {
 			}else if DBgetUser.Permissions == "doctors"{
 				c.JSON(200, gin.H{
 					"LOGIN": DBgetUser.Login,
-					"url": "http://localhost:3000/DoctorPanel",
+					"url": "http://127.0.0.1:3000/doctorpanel",
 				})
 			}
 		}
