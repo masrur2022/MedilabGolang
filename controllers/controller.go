@@ -64,18 +64,18 @@ func Login(c *gin.Context) {
 			// """""""""""""""""""""""""send the login for user"""""""""""""""""""""""""
 			if DBgetUser.Permissions == "admin"{
 				c.JSON(200, gin.H{
-					"LOGIN": DBgetUser.Login,
-					"url": "http://localhost:3000/admin",
+					"STATUS": "AUTHORIZED",
+					"url": "http://127.0.0.1:3000/admin",
 				})
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
-					"LOGIN": DBgetUser.Login,
-					"url": "http://localhost:3000/userpanel",
+					"STATUS": "AUTHORIZED",
+					"url": "http://127.0.0.1:3000/userpanel",
 				})
 			}else if DBgetUser.Permissions == "doctors"{
 				c.JSON(200, gin.H{
-					"LOGIN": DBgetUser.Login,
-					"url": "http://localhost:3000/DoctorPanel",
+					"STATUS": "AUTHORIZED",
+					"url": "http://127.0.0.1:3000/doctorpanel",
 				})
 			}
 		}
@@ -107,17 +107,17 @@ func Login(c *gin.Context) {
 			// """""""""""""""""""""""""send the login for user"""""""""""""""""""""""""
 			if DBgetUser.Permissions == "admin"{
 				c.JSON(200, gin.H{
-					"LOGIN": DBgetUser.Login,
+					"STATUS": "AUTHORIZED",
 					"url": "http://127.0.0.1:3000//admin",
 				})
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
-					"LOGIN": DBgetUser.Login,
-					"url": "http://localhost:3000/userpanel",
+					"STATUS": "AUTHORIZED",
+					"url": "http://127.0.0.1:3000/userpanel",
 				})
 			}else if DBgetUser.Permissions == "doctors"{
 				c.JSON(200, gin.H{
-					"LOGIN": DBgetUser.Login,
+					"STATUS": "AUTHORIZED",
 					"url": "http://127.0.0.1:3000/doctorpanel",
 				})
 			}
@@ -587,6 +587,6 @@ func Cors(c *gin.Context) {
 		c.AbortWithStatus(200)
 		return
 	}
-	
+
 	c.Next()
 }
