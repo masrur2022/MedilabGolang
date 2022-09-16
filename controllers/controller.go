@@ -65,17 +65,17 @@ func Login(c *gin.Context) {
 			if DBgetUser.Permissions == "admin"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "https://med-card-fde99--pr2-masrur-changes-3e4n1u50.web.app/admin",
+					"url": "http://127.0.0.1/admin",
 				})
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "https://med-card-fde99--pr2-masrur-changes-3e4n1u50.web.app/userpanel",
+					"url": "http://127.0.0.1/userpanel",
 				})
 			}else if DBgetUser.Permissions == "doctors"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "https://med-card-fde99--pr2-masrur-changes-3e4n1u50.web.app/doctorpanel",
+					"url": "http://127.0.0.1/doctorpanel",
 				})
 			}
 		}
@@ -113,12 +113,12 @@ func Login(c *gin.Context) {
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "https://med-card-fde99--pr2-masrur-changes-3e4n1u50.web.app/userpanel",
+					"url": "http://127.0.0.1/userpanel",
 				})
 			}else if DBgetUser.Permissions == "doctors"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "https://med-card-fde99--pr2-masrur-changes-3e4n1u50.web.app/doctorpanel",
+					"url": "http://127.0.0.1/doctorpanel",
 				})
 			}
 		}
