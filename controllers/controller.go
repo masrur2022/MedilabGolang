@@ -108,7 +108,7 @@ func Login(c *gin.Context) {
 			if DBgetUser.Permissions == "admin"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "https://med-card-fde99--pr2-masrur-changes-3e4n1u50.web.app//admin",
+					"url": "http://127.0.0.1/admin",
 				})
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
