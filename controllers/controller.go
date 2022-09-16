@@ -65,17 +65,17 @@ func Login(c *gin.Context) {
 			if DBgetUser.Permissions == "admin"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "http://127.0.0.1/admin",
+					"url": "https://med-card-fde99--pr5-jahongir-1-c4g0ek4e.web.app/admin",
 				})
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "http://127.0.0.1/userpanel",
+					"url": "https://med-card-fde99--pr5-jahongir-1-c4g0ek4e.web.app/userpanel",
 				})
 			}else if DBgetUser.Permissions == "doctors"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "http://127.0.0.1/doctorpanel",
+					"url": "https://med-card-fde99--pr5-jahongir-1-c4g0ek4e.web.app/doctorpanel",
 				})
 			}
 		}
@@ -108,17 +108,17 @@ func Login(c *gin.Context) {
 			if DBgetUser.Permissions == "admin"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "http://127.0.0.1/admin",
+					"url": "https://med-card-fde99--pr5-jahongir-1-c4g0ek4e.web.app/admin",
 				})
 			}else if DBgetUser.Permissions == "client"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "http://127.0.0.1/userpanel",
+					"url": "https://med-card-fde99--pr5-jahongir-1-c4g0ek4e.web.app/userpanel",
 				})
 			}else if DBgetUser.Permissions == "doctors"{
 				c.JSON(200, gin.H{
 					"STATUS": "AUTHORIZED",
-					"url": "http://127.0.0.1/doctorpanel",
+					"url": "https://med-card-fde99--pr5-jahongir-1-c4g0ek4e.web.app/doctorpanel",
 				})
 			}
 		}
@@ -579,7 +579,7 @@ func Logout(c *gin.Context) {
 	})
 }
 func Cors(c *gin.Context) {
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:3000")
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "https://med-card-fde99--pr5-jahongir-1-c4g0ek4e.web.app")
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, ResponseType, accept, origin, Cache-Control, X-Requested-With")
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE")
